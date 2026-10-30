@@ -1,3 +1,5 @@
+<a id="readme-top"></a>
+
 # MediQuery — Medical Knowledge, Made Accessible
 
 <p align="center">
@@ -20,37 +22,38 @@
   <img src="https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
   <img src="https://img.shields.io/badge/Package_Manager-uv-DE5FE9?style=for-the-badge" alt="uv" />
   <img src="https://img.shields.io/badge/LLM-Google_Gemini-4285F4?style=for-the-badge&logo=google" alt="Google Gemini" />
-  <img src="https://img.shields.io/badge/Architecture-RAG-202020?style=for-the-badge" alt="Retrieval Augmented Generation" />
+  <img src="https://img.shields.io/badge/Architecture-RAG-202020?style=for-the-badge" alt="Retrieval-Augmented Generation" />
+  <img src="https://img.shields.io/badge/UI-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit" />
 </p>
 
 ---
 
 ## About the Project
 
-MediQuery is an AI-powered medical knowledge assistant designed to answer questions using information retrieved from a curated collection of medical documents.
+MediQuery is an AI-powered medical knowledge assistant designed to answer questions using information retrieved from medical PDF documents supplied by the user.
 
-General-purpose language models can produce fluent answers, but their responses may be outdated, unsupported, or incorrect. MediQuery explores how **Retrieval-Augmented Generation (RAG)** can improve answer grounding by retrieving relevant document passages before generating a response.
+General-purpose language models can produce fluent answers, but their responses may be unsupported or incorrect. MediQuery explores how **Retrieval-Augmented Generation (RAG)** can improve answer grounding by retrieving relevant document passages before generating a response.
 
 Instead of relying exclusively on a model's parametric knowledge, the system follows a retrieval-first workflow:
 
-1. Ingest medical documents.
-2. Extract and clean their text.
-3. Split the text into searchable chunks.
-4. Convert chunks into vector embeddings.
-5. Retrieve relevant passages for a user's question.
+1. Ingest medical PDF documents.
+2. Extract and clean page-level text.
+3. Split text into overlapping chunks.
+4. Convert chunks into vector embeddings locally.
+5. Retrieve relevant passages using FAISS similarity search.
 6. Generate a response using Google Gemini and the retrieved context.
-7. Provide source references to help users verify the information.
+7. Display source document names, page numbers, and retrieved passages.
 
-The project begins with a small, working prototype and is designed to evolve into a modular application with better retrieval, evaluation, observability, and deployment.
+The current implementation is a working Streamlit prototype. Its modular components are designed to support future improvements in retrieval quality, evaluation, document management, and deployment.
 
 ### Project Goals
 
 - Build a practical RAG pipeline from the ground up.
-- Understand document processing, embeddings, vector databases, and LLM integration.
+- Understand document processing, embeddings, vector search, and LLM integration.
 - Ground generated answers in retrieved evidence.
 - Make responses more transparent through source attribution.
-- Develop a modular codebase that can support future improvements.
-- Deploy an accessible demonstration without requiring a paid OpenAI API.
+- Maintain a modular codebase that can support future improvements.
+- Provide a demonstration without relying on the OpenAI API.
 
 > **Important:** MediQuery is an experimental educational project, not a medical device or a substitute for professional medical advice. Generated answers can be inaccurate or incomplete. Medical decisions should be made with qualified healthcare professionals.
 
@@ -58,50 +61,55 @@ The project begins with a small, working prototype and is designed to evolve int
 
 ### Core Prototype
 
-- [ ] Upload and ingest medical PDF documents.
-- [ ] Extract, clean, and chunk document text.
-- [ ] Generate vector embeddings.
-- [ ] Store and search embeddings using a vector database.
-- [ ] Generate context-grounded answers using Google Gemini.
-- [ ] Display source documents and relevant passages.
-- [ ] Provide a simple API for submitting questions.
-- [ ] Handle missing or insufficient evidence without fabricating citations.
+- [x] Upload and ingest medical PDF documents through Streamlit.
+- [x] Extract page-level text using PyMuPDF.
+- [x] Clean whitespace and chunk document text with overlap.
+- [x] Generate normalized embeddings with Sentence Transformers.
+- [x] Index and retrieve vectors using FAISS.
+- [x] Generate context-grounded answers using Google Gemini.
+- [x] Display source document names and page citations.
+- [x] Inspect retrieved passages and similarity scores.
+- [x] Load configuration from environment variables and `.env`.
+- [x] Save and reload the local FAISS index and chunk metadata.
+- [x] Test core components using pytest.
 
 ### Planned Enhancements
 
-- [ ] Interactive web interface.
-- [ ] Support for multiple document formats.
+- [ ] Robust document IDs and handling of duplicate filenames.
+- [ ] Remove and replace documents from the knowledge base.
+- [ ] OCR support for scanned PDFs.
+- [ ] Retrieval evaluation using Recall@K, Precision@K, and Mean Reciprocal Rank.
+- [ ] Answer faithfulness and citation verification.
 - [ ] Hybrid retrieval combining semantic and keyword search.
 - [ ] Reranking for improved retrieval quality.
-- [ ] Conversation history and follow-up questions.
-- [ ] Automated retrieval and answer evaluation.
-- [ ] Docker-based deployment.
-- [ ] Production deployment with authentication and appropriate access controls.
+- [ ] Improved conversation context and follow-up questions.
+- [ ] User-isolated storage, authentication, and access control.
+- [ ] Production deployment with persistent storage and monitoring.
 
-*The checklist describes the project roadmap; it does not imply that every feature is already implemented.*
+*The checklist distinguishes implemented prototype functionality from planned work. Deployment to a hosted environment and production readiness should be verified separately.*
 
 ## How It Works
 
 ```mermaid
 flowchart TD
-    A[Medical Documents] --> B[Text Extraction]
+    A[Medical PDF Documents] --> B[Text Extraction with PyMuPDF]
     B --> C[Cleaning and Chunking]
-    C --> D[Embedding Model]
-    D --> E[Vector Database]
+    C --> D[Local Sentence Transformer Embeddings]
+    D --> E[FAISS Vector Index]
 
     F[User Question] --> G[Query Embedding]
     G --> H[Similarity Search]
     E --> H
 
-    H --> I[Retrieved Context]
+    H --> I[Retrieved Passages]
     I --> J[Google Gemini]
-    J --> K[Grounded Answer]
-    K --> L[Answer with Sources]
+    J --> K[Answer with Source Citations]
+    K --> L[Streamlit Interface]
 ```
 
-The ingestion pipeline processes documents before a user submits a question. At query time, the system searches the indexed content, selects relevant passages, and provides them as context to the language model.
+The ingestion pipeline processes documents before a question is submitted. At query time, the system embeds the question, retrieves relevant chunks from the FAISS index, and sends those passages to Gemini as context.
 
-Retrieval quality is a major determinant of answer quality. A fluent response is not necessarily a correct response, so source verification and evaluation are essential parts of the project.
+Retrieval quality is a major determinant of answer quality. A fluent response is not necessarily a correct response, so users should inspect cited passages and verify important claims against the original documents.
 
 ## Built With
 
@@ -109,16 +117,17 @@ Retrieval quality is a major determinant of answer quality. A fluent response is
 |---|---|
 | [Python](https://www.python.org/) | Core application language |
 | [uv](https://docs.astral.sh/uv/) | Python project and dependency management |
-| [FastAPI](https://fastapi.tiangolo.com/) | REST API |
+| [Streamlit](https://streamlit.io/) | Interactive web interface |
 | [Google Gemini](https://ai.google.dev/gemini-api/docs) | Context-grounded response generation |
-| [Sentence Transformers](https://www.sbert.net/) | Text embedding generation |
-| [ChromaDB](https://docs.trychroma.com/) | Vector storage and similarity search |
-| [PyPDF](https://pypdf.readthedocs.io/) | PDF text extraction |
+| [Sentence Transformers](https://www.sbert.net/) | Local text embedding generation |
+| [FAISS](https://github.com/facebookresearch/faiss) | Vector indexing and similarity search |
+| [PyMuPDF](https://pymupdf.readthedocs.io/) | PDF text extraction |
+| [python-dotenv](https://pypi.org/project/python-dotenv/) | Local environment configuration |
 | [pytest](https://docs.pytest.org/) | Automated testing |
 
-The stack is intended for the initial prototype. Individual components can be replaced as the application evolves.
+The current stack is intended for a local-first prototype. Components can be replaced as the application evolves.
 
-**Cost note:** The prototype avoids the OpenAI API, but Gemini API usage may be subject to quotas, rate limits, and pricing. Local embedding models also require compute resources.
+**Cost note:** The prototype does not use the OpenAI API. Gemini API usage may still be subject to quotas, rate limits, model availability, and pricing. Local embedding models require disk space and compute resources, and the model may need to be downloaded on first use.
 
 ## Getting Started
 
@@ -128,7 +137,7 @@ Follow these steps to set up the project locally.
 
 Make sure you have:
 
-- Python 3.12 or a compatible version.
+- Python 3.12.
 - `uv` installed.
 - Git installed.
 - A Google AI Studio API key for Gemini access.
@@ -159,6 +168,8 @@ git clone https://github.com/YOUR_USERNAME/mediquery.git
 cd mediquery
 ```
 
+If your GitHub repository has a different name, use that repository URL and directory name.
+
 ### 3. Install Dependencies
 
 Install the project and its dependencies using `uv`:
@@ -169,15 +180,7 @@ uv sync
 
 This creates or synchronizes the project virtual environment using `pyproject.toml` and `uv.lock`.
 
-If you are setting up the project from scratch, add dependencies using:
-
-```bash
-uv add fastapi uvicorn pypdf sentence-transformers chromadb
-uv add google-genai python-dotenv
-uv add --dev pytest httpx ruff
-```
-
-Use the package names and versions specified by the actual project configuration if it already exists.
+Use the dependencies recorded in the project's actual configuration rather than installing an unrelated stack.
 
 ### 4. Configure Environment Variables
 
@@ -187,156 +190,208 @@ Create a `.env` file in the project root:
 cp .env.example .env
 ```
 
-Add your Google Gemini API key:
+Add your Google Gemini API key and the model/configuration values supported by the project:
 
 ```dotenv
 GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.5-flash
+
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+
+CHUNK_SIZE=1200
+CHUNK_OVERLAP=200
+TOP_K=5
 ```
 
-Obtain an API key through [Google AI Studio](https://aistudio.google.com/apikey).
+Obtain an API key through [Google AI Studio](https://aistudio.google.com/apikey). Choose a Gemini model available to your API account.
 
-Never commit `.env` or expose API keys in source code, screenshots, logs, or public repositories.
+Never commit `.env` or expose API keys in source code, screenshots, logs, or public repositories. Keep `.env.example` free of real secrets.
 
 ### 5. Run the Application
 
-Once the API entry point has been implemented, start the development server with:
+Start the Streamlit development server:
 
 ```bash
-uv run uvicorn app.main:app --reload
+uv run streamlit run app.py
 ```
 
-Open the interactive API documentation at:
+Open the local URL displayed in the terminal, typically:
 
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8501
 ```
 
-The command assumes that the application entry point is `app/main.py` and exposes a FastAPI instance named `app`. Adjust it if your project uses a different structure.
+On first use, the local embedding model may need to be downloaded.
+
+### 6. Run Tests
+
+Run the test suite:
+
+```bash
+uv run pytest -v
+```
+
+The tests cover the implemented ingestion, chunking, embedding, retrieval, generation, pipeline, configuration, and persistence components.
 
 ## Project Structure
 
-The intended structure separates document processing, retrieval, model integration, and API logic so that each component can be improved independently.
+The current project separates document processing, retrieval, generation, configuration, and persistence so each component can be improved independently.
 
 ```text
 mediquery/
-├── app/
-│   ├── main.py                 # FastAPI application
-│   ├── config.py               # Environment and settings
-│   ├── api/
-│   │   └── routes.py           # API endpoints
-│   ├── ingestion/
-│   │   ├── loader.py           # Document loading
-│   │   └── chunker.py          # Text chunking
-│   ├── retrieval/
-│   │   ├── embeddings.py       # Embedding generation
-│   │   └── vector_store.py     # Vector search
-│   ├── generation/
-│   │   └── llm.py              # Gemini integration
-│   └── services/
-│       └── rag.py              # RAG orchestration
-├── data/
-│   └── documents/              # Local development documents
-├── tests/
-│   ├── test_ingestion.py
-│   └── test_retrieval.py
-├── .env.example
+├── app.py                         # Streamlit application
+├── pyproject.toml                 # Project metadata and dependencies
+├── uv.lock                        # Locked dependency versions
+├── .python-version                # Python version selection
+├── .env.example                   # Example environment configuration
 ├── .gitignore
-├── pyproject.toml
-├── uv.lock
 ├── README.md
-└── LICENSE
+├── src/
+│   └── medical_rag/
+│       ├── __init__.py
+│       ├── config.py              # Environment and settings
+│       ├── ingestion.py           # PDF text extraction
+│       ├── chunking.py            # Text chunking
+│       ├── embeddings.py          # Local embedding generation
+│       ├── retrieval.py           # FAISS similarity search
+│       ├── generation.py          # Gemini integration
+│       ├── pipeline.py            # RAG orchestration
+│       └── persistence.py         # Local index and metadata storage
+├── tests/                         # Automated tests
+└── data/
+    └── processed/
+        └── knowledge_base/        # Generated local index and metadata
 ```
 
-This is a proposed structure. Create modules as their functionality is implemented rather than adding empty files for every planned component.
+The knowledge-base directory is generated at runtime. Do not commit uploaded medical documents, generated indexes, or private data to the repository.
 
 ## Usage
 
-The intended interaction is straightforward:
-
-1. Add permitted medical documents to the ingestion workflow.
-2. Process the documents and index their text.
-3. Submit a question through the API.
-4. Retrieve relevant document passages.
-5. Generate an answer using the retrieved context.
-6. Review the answer alongside its source references.
+1. Start the Streamlit application.
+2. Upload one or more text-based medical PDF documents in the sidebar.
+3. Wait for the documents to be processed and indexed.
+4. Enter a question that can be answered from the uploaded documents.
+5. Review the generated answer and its source citations.
+6. Expand **Inspect retrieved passages** to examine the text and similarity scores used for generation.
 
 For example, a user might ask:
 
-> What are the common symptoms of iron-deficiency anemia according to the uploaded clinical reference?
+> What symptoms are described for a condition in the uploaded clinical reference?
 
-The application should retrieve relevant passages and generate a response that distinguishes information supported by those passages from anything it cannot establish.
+The answer should be checked against the cited document passages. If the source material does not provide enough information, the system should acknowledge that limitation rather than inventing evidence.
 
-Example API requests and responses will be documented here once the corresponding endpoints are implemented.
+## Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | Not set | API key for Gemini |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Answer-generation model; availability may vary |
+| `EMBEDDING_MODEL` | `sentence-transformers/all-MiniLM-L6-v2` | Local embedding model |
+| `CHUNK_SIZE` | `1200` | Target chunk size in characters |
+| `CHUNK_OVERLAP` | `200` | Character overlap between chunks |
+| `TOP_K` | `5` | Default number of passages retrieved |
+
+Settings are loaded from environment variables and, for local development, the `.env` file.
+
+## Persistence
+
+The prototype saves its knowledge base locally:
+
+```text
+data/processed/knowledge_base/
+├── index.faiss
+└── metadata.json
+```
+
+- `index.faiss` stores vectors used for similarity search.
+- `metadata.json` stores chunk text, source-page metadata, and document hashes.
+
+The current persistence implementation uses the local filesystem. Data may not survive redeployment on hosting platforms with ephemeral storage. The current document-management design also needs stronger document identity, duplicate-filename handling, and deletion support before it is appropriate for multi-user use.
+
+## Deployment
+
+The Streamlit interface can be deployed using [Streamlit Community Cloud](https://share.streamlit.io/).
+
+High-level deployment steps:
+
+1. Push the project to a GitHub repository.
+2. Commit `pyproject.toml`, `uv.lock`, `.python-version`, source files, tests, and this README.
+3. Ensure `.env`, uploaded PDFs, and generated knowledge-base files are excluded from Git.
+4. Configure `GEMINI_API_KEY` through the hosting platform's secrets interface.
+5. Deploy `app.py` as the entry point.
+6. Test upload, retrieval, answer generation, citations, and restart behavior.
+
+See the [Streamlit Community Cloud deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app).
+
+**Deployment warning:** The current app writes a shared index and metadata to local disk. Do not expose it as a public multi-user service with document uploads until document isolation, access control, and storage behavior have been addressed. For an initial demonstration, use non-sensitive documents and restrict access where possible.
 
 ## Safety and Responsible Use
 
-Medical information requires particular care. MediQuery is being developed with the following principles in mind:
+Medical information requires particular care. MediQuery follows these development principles:
 
 - **Evidence first:** Answers should be grounded in retrieved documents.
 - **Source transparency:** Users should be able to inspect the passages supporting an answer.
-- **Honest uncertainty:** The system should acknowledge when evidence is missing or conflicting.
-- **Privacy:** Avoid uploading identifiable patient records unless the system has appropriate authorization, safeguards, and compliance measures.
-- **No autonomous diagnosis:** The prototype is not intended to diagnose conditions, prescribe treatments, or replace a clinician.
-- **Continuous evaluation:** Retrieval failures, unsupported claims, and misleading citations must be tested.
+- **Honest uncertainty:** The system should acknowledge when evidence is missing.
+- **Privacy:** Do not upload identifiable patient records unless appropriate authorization, safeguards, and compliance requirements are in place.
+- **No autonomous diagnosis:** The prototype is not intended to diagnose conditions, prescribe treatment, or replace a clinician.
+- **Continuous evaluation:** Retrieval failures, unsupported claims, and misleading citations need to be tested.
 
-Retrieval and citations can reduce some risks, but they do not guarantee medical correctness or eliminate hallucinations.
+Retrieval and citations can reduce some risks, but they do not guarantee medical correctness or eliminate hallucinations. Questions and retrieved passages are sent to the configured Gemini API for answer generation; review the provider's applicable data-handling terms before using sensitive information.
 
 ## Roadmap
 
 ### Phase 1 — Working Prototype
 
-- [ ] Initialize the project using `uv`.
-- [ ] Configure Gemini securely.
-- [ ] Load and extract text from medical PDFs.
-- [ ] Implement chunking and embedding generation.
-- [ ] Store embeddings and retrieve relevant passages.
-- [ ] Generate answers grounded in retrieved context.
-- [ ] Return source references through a FastAPI endpoint.
-- [ ] Add basic automated tests.
+- [x] Initialize the project using `uv`.
+- [x] Configure Gemini and environment variables.
+- [x] Load and extract text from medical PDFs.
+- [x] Implement chunking and local embedding generation.
+- [x] Store embeddings and retrieve relevant passages using FAISS.
+- [x] Generate answers grounded in retrieved context.
+- [x] Display source references in the Streamlit interface.
+- [x] Add automated tests for core components.
+- [x] Save and reload the local knowledge base.
 
 ### Phase 2 — Better Retrieval
 
 - [ ] Experiment with chunk sizes and overlap.
-- [ ] Evaluate embedding models.
+- [ ] Evaluate alternative embedding models.
 - [ ] Add metadata filtering and hybrid retrieval.
 - [ ] Introduce reranking.
 - [ ] Measure retrieval precision and recall.
 - [ ] Build a small evaluation dataset.
+- [ ] Evaluate answer faithfulness and citation correctness.
 
-### Phase 3 — User Experience
+### Phase 3 — User Experience and Document Management
 
-- [ ] Build a chat interface.
-- [ ] Support document uploads and indexing status.
-- [ ] Display citations alongside answers.
-- [ ] Add conversation context.
-- [ ] Improve error handling and feedback.
+- [x] Build a basic web interface.
+- [x] Support PDF uploads and indexing status.
+- [x] Display citations alongside answers.
+- [ ] Add robust document IDs and duplicate-filename handling.
+- [ ] Support document removal and replacement.
+- [ ] Add OCR for scanned PDFs.
+- [ ] Improve conversation context and user feedback.
 
 ### Phase 4 — Deployment and Reliability
 
-- [ ] Containerize the application.
-- [ ] Deploy a public demonstration.
-- [ ] Add authentication and rate limiting where appropriate.
+- [ ] Verify and document a hosted demonstration.
+- [ ] Use persistent storage appropriate for the hosting platform.
+- [ ] Add authentication and document-level access control.
 - [ ] Configure monitoring and structured logging.
-- [ ] Add safeguards for document access and sensitive data.
-- [ ] Evaluate performance, reliability, and operating costs.
+- [ ] Add safeguards for sensitive data.
+- [ ] Evaluate reliability, latency, and operating costs.
 
-See the [open issues](https://github.com/YOUR_USERNAME/mediquery/issues) for planned improvements and known problems.
+See the [open issues](https://github.com/YOUR_USERNAME/mediquery/issues) for planned improvements and known problems. Replace the placeholder URL with the actual repository URL.
 
 ## Testing
 
 Run the test suite using:
 
 ```bash
-uv run pytest
+uv run pytest -v
 ```
 
-Run linting with:
-
-```bash
-uv run ruff check .
-```
-
-Testing should cover document extraction, chunk boundaries, retrieval relevance, API behavior, missing context, and failures from external model services.
+Testing should cover document extraction, chunk boundaries, retrieval relevance, missing context, citation handling, persistence, and failures from external model services.
 
 ## Contributing
 
@@ -350,39 +405,33 @@ Contributions, bug reports, documentation improvements, and constructive feedbac
    ```
 
 3. Make your changes and add appropriate tests.
-4. Run the test suite and lint checks.
+4. Run the test suite.
 5. Commit your changes:
 
    ```bash
-   git commit -m "Add your feature"
+   git commit -m "Describe your change"
    ```
 
 6. Push the branch and open a pull request.
 
-For major changes, open an issue first to discuss the proposed approach.
-
-Please do not contribute private patient data, API keys, or copyrighted medical documents without the appropriate permissions.
+For major changes, open an issue first to discuss the proposed approach. Do not contribute private patient data, API keys, or copyrighted medical documents without appropriate permissions.
 
 ## License
 
-This project has not yet selected a license. Add a `LICENSE` file before publishing the repository as an open-source project.
-
-A license such as MIT may be suitable for a learning-oriented project, provided its terms meet your requirements.
+This project has not yet selected a license. Add a `LICENSE` file before publishing the repository as an open-source project. Review the terms carefully before choosing a license.
 
 ## Acknowledgments
 
 - [Google AI for Developers](https://ai.google.dev/) for Gemini API documentation.
 - [Astral](https://astral.sh/) for `uv`.
-- The maintainers of FastAPI, Sentence Transformers, ChromaDB, and PyPDF.
+- The maintainers of Streamlit, Sentence Transformers, FAISS, PyMuPDF, and pytest.
 - The open-source community working on retrieval-augmented generation and responsible AI.
 
 ---
 
 <p align="center">
-  <strong>MediQuery</strong>
-  <br />
-  Medical knowledge, grounded in evidence.
-  <br />
+  <strong>MediQuery</strong><br />
+  Medical knowledge, grounded in evidence.<br />
   <sub>Built as an educational project exploring RAG, information retrieval, and responsible AI.</sub>
 </p>
 
