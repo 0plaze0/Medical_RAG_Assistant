@@ -11,7 +11,10 @@
 </p>
 
 <p align="center">
-  <img src="image/demo.gif" width="60%">
+
+[![Watch the demo](image/demo.gif)](https://youtu.be/dGOZ2F0acWY)
+Click the thumbnail above to watch the full demonstration.
+  
 </p>
 
 
