@@ -1,0 +1,29 @@
+[project]
+name = "medical-assistant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "0plaze0", email = "akash.banik.dev@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "faiss-cpu>=1.15.1",
+    "google-genai>=2.34.0",
+    "pymupdf>=2.0",
+    "python-dotenv>=1.2.4",
+    "sentence-transformers>=6.2.0",
+    "streamlit>=1.66.1",
+]
+
+[project.scripts]
+medical-assistant = "medical_assistant:main"
+
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
