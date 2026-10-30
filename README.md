@@ -11,6 +11,12 @@
 </p>
 
 <p align="center">
+  <img src="image/demo.gif" width="60%">
+</p>
+
+
+
+<p align="center">
   <a href="#about-the-project">About</a> ·
   <a href="#features">Features</a> ·
   <a href="#getting-started">Getting Started</a> ·
