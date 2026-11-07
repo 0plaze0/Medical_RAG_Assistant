@@ -87,7 +87,8 @@ The current implementation is a working Streamlit prototype. Its modular compone
 - [ ] Robust document IDs and handling of duplicate filenames.
 - [ ] Remove and replace documents from the knowledge base.
 - [ ] OCR support for scanned PDFs.
-- [ ] Retrieval evaluation using Recall@K, Precision@K, and Mean Reciprocal Rank.
+- [x] Baseline retrieval evaluation using Precision@K, Recall@K, MRR@K, and NDCG@K.
+- [ ] Retrieval error analysis across specialties and complexity levels.
 - [ ] Answer faithfulness and citation verification.
 - [ ] Hybrid retrieval combining semantic and keyword search.
 - [ ] Reranking for improved retrieval quality.
@@ -137,6 +138,61 @@ Retrieval quality is a major determinant of answer quality. A fluent response is
 The current stack is intended for a local-first prototype. Components can be replaced as the application evolves.
 
 **Cost note:** The prototype does not use the OpenAI API. Gemini API usage may still be subject to quotas, rate limits, model availability, and pricing. Local embedding models require disk space and compute resources, and the model may need to be downloaded on first use.
+
+## Retrieval Evaluation
+
+The retrieval pipeline was evaluated using the **RAGCare-QA** benchmark dataset.
+
+### Evaluation Dataset
+
+| Property | Value |
+|---|---:|
+| Dataset | RAGCare-QA |
+| Total questions | 420 |
+| Unique supporting contexts | 404 |
+| Embedding model | `sentence-transformers/all-MiniLM-L6-v2` |
+| Vector index | FAISS (`IndexFlatIP`) |
+| Similarity metric | Cosine similarity |
+| Retrieval method | Dense vector retrieval |
+
+### Retrieval Metrics
+
+The following results were obtained using the baseline dense retrieval pipeline.
+
+| Metric | @1 | @3 | @5 | @10 |
+|---|---:|---:|---:|---:|
+| Precision | 0.6500 | 0.2556 | 0.1590 | 0.0824 |
+| Recall | 0.6500 | 0.7667 | 0.7952 | 0.8238 |
+| MRR | 0.6500 | 0.7040 | 0.7104 | 0.7144 |
+| NDCG | 0.6500 | 0.7202 | 0.7319 | 0.7413 |
+
+### Retrieval Latency
+
+| Metric | Result |
+|---|---:|
+| Average retrieval latency | 12.283 ms |
+
+Latency includes query embedding and FAISS similarity search. Corpus embedding and index construction are excluded.
+
+### Observations
+
+- **Recall@5 of 79.52%:** The supporting context was retrieved within the top five results for approximately 80% of the questions.
+- **Recall@10 of 82.38%:** Increasing the retrieval depth from five to ten results provided a smaller improvement in recall.
+- **MRR@5 of 0.7104:** Relevant contexts generally appeared near the top of the retrieved results.
+- **Average latency of 12.283 ms:** The baseline retrieval pipeline demonstrated low query-time latency on the evaluation setup.
+
+> **Evaluation scope:** These results represent controlled retrieval evaluation over the 404 unique contexts provided by RAGCare-QA. They should not be interpreted as real-world clinical retrieval performance or as evaluation over a complete medical knowledge base.
+
+### Evaluation Roadmap
+
+- [x] Establish a dense retrieval baseline using FAISS.
+- [x] Evaluate Precision@K, Recall@K, MRR@K, and NDCG@K.
+- [ ] Analyze retrieval performance across medical specialties and question complexity.
+- [ ] Compare alternative embedding models.
+- [ ] Implement BM25 keyword retrieval.
+- [ ] Evaluate hybrid retrieval.
+- [ ] Experiment with cross-encoder reranking.
+
 
 ## Getting Started
 
@@ -367,8 +423,11 @@ Retrieval and citations can reduce some risks, but they do not guarantee medical
 - [ ] Evaluate alternative embedding models.
 - [ ] Add metadata filtering and hybrid retrieval.
 - [ ] Introduce reranking.
-- [ ] Measure retrieval precision and recall.
-- [ ] Build a small evaluation dataset.
+- [x] Build a retrieval evaluation benchmark using RAGCare-QA.
+- [x] Establish baseline retrieval metrics using FAISS.
+- [ ] Analyze retrieval performance across specialties and complexity levels.
+- [ ] Compare alternative embedding models.
+- [ ] Implement and evaluate BM25 and hybrid retrieval.
 - [ ] Evaluate answer faithfulness and citation correctness.
 
 ### Phase 3 — User Experience and Document Management

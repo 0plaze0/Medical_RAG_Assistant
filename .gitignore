@@ -1,19 +1,80 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
 .venv/
+venv/
+env/
 
-# Environment secrets
-.env
-.env.*
+# uv
+.uv/
 
-# Allow a safe example configuration
-!.env.example
+# Jupyter Notebook
+.ipynb_checkpoints/
 
-# Local documents and indexes
-data/*
-!data/.gitkeep
-
-# Test and tooling caches
+# Testing and coverage
 .pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Type checking and linting
+.mypy_cache/
+.pyright/
 .ruff_cache/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Model and embedding caches
+.cache/
+models/
+checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.bin
+
+# Uploaded documents and private data
+data/raw/
+data/uploads/
+data/private/
+
+# Generated knowledge base
+data/processed/knowledge_base/
+
+# Evaluation outputs
+evaluation/results/
+
+# Temporary files
+*.tmp
+*.bak
+
+# scripts and notebooks outputs
+scripts
